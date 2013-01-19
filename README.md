@@ -19,25 +19,23 @@ Let's try it out...
 
 Let's start with a simple registration form. Your markup looks like:
 
-  <form action="/users" method="post"
-data-validate-with="better_validation">
-    <div class="error-box hide">
-      <p class="error name_is_blank">Please enter your name</p>
-      <p class="error password_is_too_short">Your password must be at
-least 6 characters.</p>
-    </div>
-    <div class="field">
-      <label for="name">Name:</label>
-      <input type="text" name="name" data-validate-blank="true" />
-    </div>
-    <div class="field">
-      <label for="password">Name:</label>
-      <input type="text" name="password" data-validate-blank="true"
-data-min-length="6" />
-    </div>
-    <div class="field">
-      <input type="submit" value="Register"
-  </form>
+    <form action="/users" method="post" data-validate-with="better_validation">
+      <div class="error-box hide">
+        <p class="error name_is_blank">Please enter your name</p>
+        <p class="error password_is_too_short">Your password must be at least 6 characters.</p>
+      </div>
+      <div class="field">
+        <label for="name">Name:</label>
+        <input type="text" name="name" data-validate-blank="true" />
+      </div>
+      <div class="field">
+        <label for="password">Name:</label>
+        <input type="text" name="password" data-validate-blank="true" data-min-length="6" />
+      </div>
+      <div class="field">
+        <input type="submit" value="Register" />
+      </div>
+    </form>
 
 And that's it! BetterValidation will automatically validate this form
 when submitted, showing and hiding errors based on the requested
@@ -50,17 +48,16 @@ Forms can also be validated/submitted via AJAX. With the above example,
 simply set the form's `data-validate-async` attribute to 'true'.
 BetterValidation will then send a request, as per the form itself.
 
-  <form action="/users" method="post"
-data-validate-with="better_validation" data-validate-async="true">
+  <form action="/users" method="post" data-validate-with="better_validation" data-validate-async="true">
 
 On the server side, simply set the 'X-Error-Messages' HTTP header to a
 string of JSON in the following format:
 
-  {
-    "name": [ "is blank" ],
-    "password": [ "is too short" ],
-    "another_field": [ "some custom error" ]
-  }
+    {
+      "name": [ "is blank" ],
+      "password": [ "is too short" ],
+      "another_field": [ "some custom error" ]
+    }
 
 The final error, not seen in the `Basic Form` example, would show the
  the HTML Element matching the selector
@@ -74,17 +71,13 @@ asynchronous validation.
 For a redirect, just set the `data-validate-async-redirect` attribute to
 the url of the redirect:
 
-  <form action="/users" method="post"
-data-validate-with="better_validation" data-validate-async="true"
-data-validate-async-redirect="/profile">
+    <form action="/users" method="post" data-validate-with="better_validation" data-validate-async="true" data-validate-async-redirect="/profile">
 
 For more complex post-validation handling, set the name of a
 globally-accessible callback to the `data-validate-async-callback`
 attribute.
 
-  <form action="/users" method="post"
-data-validate-with="better_validation" data-validate-async="true"
-data-validate-async-callback="redirect_registered_user">
+    <form action="/users" method="post" data-validate-with="better_validation" data-validate-async="true" data-validate-async-callback="redirect_registered_user">
 
 Doing so will evaluate the code `window.redirect_registered_user()`
 after the form is successfully validated asynchronously.
