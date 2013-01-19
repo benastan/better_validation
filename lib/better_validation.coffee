@@ -21,8 +21,19 @@ find_form = (target) ->
 
 find = ($context) -> -> $context.find.apply $context, arguments
 
+##########################
+# BetterValidation Class #
+##########################
+
 class BetterValidation
+
+  #################################
+  # BetterValidation::constructor #
+  # Sets up some shit.            #
+  #################################
+
   constructor: (target, overrides) ->
+
     _.extend @, overrides
 
     @$target = $ target
@@ -39,6 +50,12 @@ class BetterValidation
     @$errors = @find @error_selector
 
     @$form.find(':submit').on 'click', (e) => @validate(e)
+
+  #####################################
+  # BetterValidation::validate()      #
+  # Run when the form is submitted,   #
+  # Executes the action of validation #
+  #####################################
 
   validate: (e) ->
     return false unless @$target.has(e.target).length
@@ -72,15 +89,17 @@ class BetterValidation
     ###################################
 
     if _(errors).keys().length
+
       @apply_errors errors
       false
 
     ###################################
     # If the form is valid so far,    #
-    # send rt off to the server       #
+    # send it off to the server       #
     ###################################
 
     else if @is_ajax_form && ! @is_valid_async
+
       $.ajax
         url: @ajax_url()
         type: @method()
@@ -102,6 +121,7 @@ class BetterValidation
     ###################################
 
     else
+
       @reset_all_errors()
       @trigger 'valid'
       true
@@ -146,16 +166,20 @@ class BetterValidation
 
   toggle_errors: (show) -> toggle_hidden @$error_box, show
 
+  trigger: ->
+    arguments[0] = "better_validation:#{arguments[0]}"
+    @$target.trigger.apply @$target, arguments
+
   #########
   # Hooks #
   #########
 
-  trigger: ->
-    arguments[0] = "better_validation:#{arguments[0]}"
-    @$target.trigger.apply @$target, arguments
   process_errors: (errors) -> errors
+
   translate_error: (error, field) -> "#{field}_#{error.replace(/\ /g, '_').replace(/\'/g, '').replace(/[\(||\)]/g, '')}"
+
   process_ajax_errors: (xhr) -> $.parseJSON(xhr.getResponseHeader 'x-error-messages')
+
   after_ajax_validation: ->
     if callback = @async_callback || @get_attribute('async-callback')
       (if typeof callback is 'function' then callback else window[callback]).apply(@$target, arguments)
@@ -182,19 +206,42 @@ class BetterValidation
 # Built in validators #
 #######################
 
+########################################################################################
+#                                                                                      #
+# BetterValidation.VALIDATORS                                                          #
+#                                                                                      #
+# Validators can be added by adding a keyed array to this hash.                        #
+#                                                                                      #
+# The pattern is:                                                                      #
+#                                                                                      #
+# BetterValidation.VALIDATORS.your_validator = [ label_function, validation_function ] #
+#                                                                                      #
+# @param label_function: function returning a label used                               #
+#   for selecting error message element.                                               #
+#                                                                                      #
+# @param validation_function: funciton returning true if valid and false if not.       #
+#                                                                                      #
+# @TODO: Replace with BetterValidation.Validator sub class.                            #
+#                                                                                      #
+########################################################################################
+
 BetterValidation.VALIDATORS =
+
   blank: [
     -> 'is blank',
     -> if ($field = $ this).data('validate-blank') then $field.val() else true
   ]
+
   regex: [
     -> $(this).data('validate-regex-message') || 'regex mismatch',
     -> if regex = ($field = $ this).data('validate-regex') then new RegExp(regex).test($field.val()) else true
   ]
+
   'min-length': [
     -> $(this).data('validate-min-length-message') || 'is too short',
     -> if ($field = $(this)).data('validate-min-length') then ! ($field = $(this)).val().length >= parseInt($field.data('validate-min-length'), 10) else true
   ]
+
   'max-length': [
     -> $(this).data('validate-max-length-message') || 'is too short',
     -> if ($field = $(this)).data('validate-max-length') then ! $field.val().length <= parseInt($field.data('validate-max-length'), 10) else true
