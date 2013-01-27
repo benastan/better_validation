@@ -110,7 +110,6 @@
 
     BetterValidation.prototype.apply_errors = function(errors) {
       var _this = this;
-      console.log(errors);
       _(errors).each(function(field_errors, field) {
         return _(field_errors).each(function(error) {
           return _this.toggle_error(field, error, true);
@@ -164,7 +163,11 @@
     BetterValidation.prototype.after_ajax_validation = function() {
       var callback, redirect;
       if (callback = this.async_callback || this.get_attribute('async-callback')) {
-        return (typeof callback === 'function' ? callback : window[callback]).apply(this.$target, arguments);
+        if (typeof callback === 'function') {
+          return callback;
+        } else if (typeof (callback = window[callback]) === 'function') {
+          return callback.apply(this.$target, arguments);
+        }
       } else if (redirect = this.get_attribute('async-redirect')) {
         return window.top.location = redirect;
       } else {
