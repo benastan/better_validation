@@ -182,7 +182,7 @@ class BetterValidation
 
   after_ajax_validation: ->
     if callback = @async_callback || @get_attribute('async-callback')
-      (if typeof callback is 'function' then callback else window[callback]).apply(@$target, arguments)
+      (if typeof callback is 'function' then callback else if typeof (callback = window[callback]) is 'function' then callback.apply(@$target, arguments))
     else if redirect = @get_attribute('async-redirect')
       window.top.location = redirect
     else
