@@ -146,7 +146,6 @@ class BetterValidation
     errors
 
   apply_errors: (errors) ->
-    console.log errors
     _(errors).each (field_errors, field) =>
       _(field_errors).each (error) =>
         @toggle_error(field, error, true)
