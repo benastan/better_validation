@@ -91,6 +91,7 @@ class BetterValidation
     if _(errors).keys().length
 
       @apply_errors errors
+      @trigger('invalid', errors)
       false
 
     ###################################
@@ -112,6 +113,7 @@ class BetterValidation
         error: (xhr) =>
           errors = @process_ajax_errors(xhr)
           @apply_errors(errors)
+          @trigger('invalid', [errors, xhr])
       @trigger 'validate_async'
       false
 
@@ -146,10 +148,12 @@ class BetterValidation
     errors
 
   apply_errors: (errors) ->
-    _(errors).each (field_errors, field) =>
-      _(field_errors).each (error) =>
-        @toggle_error(field, error, true)
-    @trigger('error', errors)
+    try
+      _(errors).each (field_errors, field) =>
+        _(field_errors).each (error) =>
+          @toggle_error(field, error, true)
+      @trigger('error', errors)
+    catch error
 
   toggle_error: (field, error, show) ->
     $error = @$errors.filter ".#{@translate_error(error, field)}"

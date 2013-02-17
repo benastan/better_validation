@@ -64,6 +64,7 @@
       this.trigger('validate');
       if (_(errors).keys().length) {
         this.apply_errors(errors);
+        this.trigger('invalid', errors);
         return false;
       } else if (this.is_ajax_form && !this.is_valid_async) {
         $.ajax({
@@ -78,7 +79,8 @@
           },
           error: function(xhr) {
             errors = _this.process_ajax_errors(xhr);
-            return _this.apply_errors(errors);
+            _this.apply_errors(errors);
+            return _this.trigger('invalid', [errors, xhr]);
           }
         });
         this.trigger('validate_async');
@@ -110,12 +112,16 @@
 
     BetterValidation.prototype.apply_errors = function(errors) {
       var _this = this;
-      _(errors).each(function(field_errors, field) {
-        return _(field_errors).each(function(error) {
-          return _this.toggle_error(field, error, true);
+      try {
+        _(errors).each(function(field_errors, field) {
+          return _(field_errors).each(function(error) {
+            return _this.toggle_error(field, error, true);
+          });
         });
-      });
-      return this.trigger('error', errors);
+        return this.trigger('error', errors);
+      } catch (error) {
+
+      }
     };
 
     BetterValidation.prototype.toggle_error = function(field, error, show) {
